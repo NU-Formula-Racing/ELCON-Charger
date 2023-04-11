@@ -63,26 +63,17 @@ public:
 private:
     ICAN &can_interface_;
 
-    CANSignal<uint8_t, 0, 8, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Max_Allowable_Charging_Terminal_Voltage_High_Byte{};
-    CANSignal<uint8_t, 8, 16, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Max_Allowable_Charging_Terminal_Voltage_Low_Byte{};
-    CANSignal<uint8_t, 16, 24, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Max_Allowable_Charging_Current_High_Byte{};
-    CANSignal<uint8_t, 24, 32, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Max_Allowable_Charging_Current_Low_Byte{};
-    CANSignal<bool, 32, 33, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Control{};
-    CANTXMessage<5> Message1{can_interface, 0x1806E5F4, 8, 500, Max_Allowable_Charging_Terminal_Voltage_High_Byte, Max_Allowable_Charging_Terminal_Voltage_Low_Byte,
+    MakeUnsignedCANSignal(uint16_t, 0, 16, 0.1, 0) Max_Allowable_Charging_Terminal_Voltage_High_Byte{};
+    <uint16_t, 0, 16, 0.1, 0> Max_Allowable_Charging_Terminal_Voltage_High_Byte{};
+    MakeUnsignedCANSignal(uint16_t, 16, 16, 0.1, 0) Max_Allowable_Charging_Current_High_Byte{};
+    MakeUnsignedCANSignal(bool, 32, 1, 1, 0) Control{};
+    CANTXMessage<3> Message1{can_interface, 0x1806E5F4, 8, 500, Max_Allowable_Charging_Terminal_Voltage_High_Byte, Max_Allowable_Charging_Terminal_Voltage_Low_Byte,
                              Max_Allowable_Charging_Current_High_Byte, Max_Allowable_Charging_Current_Low_Byte, Control};
 
-    CANSignal<uint8_t, 0, 8, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Output_Voltage_High_Byte{};
-    CANSignal<uint8_t, 8, 16, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Output_Voltage_Low_Byte{};
-    CANSignal<uint8_t, 16, 24, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Output_Current_High_Byte{};
-    CANSignal<uint8_t, 24, 32, CANTemplateConvertFloat(0.1), CANTemplateConvertFloat(0)> Output_Current_Low_Byte{};
-    CANRXMessage<4> Message2{can_interface, 0x18FF50E5, Output_Voltage_High_Byte, Output_Voltage_Low_Byte, Output_Current_High_Byte,
-                             Output_Current_Low_Byte};
+    MakeUnsignedCANSignal(uint16_t, 0, 16, 0, 0) Output_Voltage_High_Byte{};
+    MakeUnsignedCANSignal(uint16_t, 16, 16, 0, 0) Output_Voltage_High_Byte{};
+    MakeUnsignedCANSignal(uint8_t, 32, 8, 0, 0) Status_Flags{};
 
-    CANSignal<bool, 0, 1, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Hardware_Failure{};
-    CANSignal<bool, 1, 1, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Temperature_of_Charger{};
-    CANSignal<bool, 2, 1, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Input_Voltage{};
-    CANSignal<bool, 3, 1, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Starting_state{};
-    CANSignal<bool, 4, 1, CANTemplateConvertFloat(1), CANTemplateConvertFloat(0)> Communication_state{};
-    CANRXMessage<4> Status{can_interface, 0x18FF50E5, Hardware_Failure, Temperature_of_Charger, Input_Voltage,
-                           Starting_state, Communication_state};
+    CANRXMessage<3> Message2{can_interface, 0x18FF50E5, Output_Voltage_High_Byte, Output_Current_High_Byte,
+                             Status_Flags};
 };
