@@ -9,15 +9,33 @@ class ElconCharger : public ICharger
 public:
     ElconCharger(ICAN &can_interface) : can_interface_{can_interface} {}
 
-    enum class FaultPositions : int
+    union Status
     {
-        Hardware_Failure = 0,
-        Temperature_of_Charger,
-        Input_Voltage,
-        Starting_state,
-        Communication_state,
-
+        uint8_t all_flags = 0;
+        struct flags
+        {
+            bool HardwareFailure : 1;
+            bool OverTemperature : 1;
+            bool InputVoltageFault : 1;
+            bool StartingState : 1;
+            bool CommunicationTimeout : 1;
+            bool res1 : 1;
+            bool res2 : 1;
+            bool res3 : 1;
+        } flags;
     };
+
+    uint16_t GetFaults()
+    {
+        uint16_t faults = 0;
+        faults |= bool(HardwareFailure) << int(FaultPositions::HardwareFailure);
+        faults |= bool(OverTemperature) << int(FaultPositions::OverTemperature);
+        faults |= bool(InputVoltageFault) << int(FaultPositions::InputVoltageFault);
+        faults |= bool(StartingState) << int(FaultPositions::StartingState);
+        faults |= bool(CommunicationTimeout) << int(FaultPositions::CommunicationTimeout);
+
+        return faults;
+    }
 
     void Enable()
     {
@@ -46,18 +64,6 @@ public:
     float GetOutputCurrent()
     {
         return Output_Current_High_Byte;
-    }
-
-    uint16_t GetFaults()
-    {
-        uint16_t faults = 0;
-        faults |= bool(Hardware_Failure) << int(FaultPositions::Hardware_Failure);
-        faults |= bool(Temperature_of_Charger) << int(FaultPositions::Temperature_of_Charger);
-        faults |= bool(Input_Voltage) << int(FaultPositions::Input_Voltage);
-        faults |= bool(Starting_state) << int(FaultPositions::Starting_state);
-        faults |= bool(Communication_state) << int(FaultPositions::Communication_state);
-
-        return faults;
     }
 
 private:
